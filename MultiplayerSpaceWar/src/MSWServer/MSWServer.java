@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -18,18 +19,19 @@ public class MSWServer extends TimerTask implements Shared.Constants
 	private int nextAvailableID;
 	private ServerSocket mySocket;
 	private Map<Integer, MSWS_Player> players;
-	private Map<Integer, Integer> inputs;
+	private Date lastUpdate;
 	
 	public MSWServer()
 	{
 		super();
 		nextAvailableID = 0;
+		lastUpdate = new Date();
 		Timer t = new Timer();
 		t.scheduleAtFixedRate(this, 0, 20);
 		players = new HashMap<Integer, MSWS_Player>();
 		setupNetworking();
 		
-		inputs = new HashMap<Integer, Integer>();
+		
 		
 		
 		
@@ -68,7 +70,13 @@ public class MSWServer extends TimerTask implements Shared.Constants
 	public void run()
 	{
 		 // game loop
-	;
+		Date currentTime = new Date();
+		double dT = (currentTime.getTime() - lastUpdate.getTime()) / 1000.0;
+		lastUpdate = currentTime;
+		
+		
+		
+		
 	}
 	
 	public void broadcast(int messageType, String[] params)
