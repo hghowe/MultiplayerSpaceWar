@@ -17,6 +17,9 @@ public class MSWS_Player extends GameElement
 	private PrintWriter myPrintWriter;
 	private int myUserControls;
 	private double timeSinceLastShot;
+	private boolean isUsingPowerup;
+	private int powerupType;
+	private int powerupDuration;
 	
 	private double health;
 	
@@ -36,6 +39,9 @@ public class MSWS_Player extends GameElement
 		myUserControls = 0;
 		health = 15;
 		timeSinceLastShot = 0;
+		isUsingPowerup = false;
+		powerupType = 0;
+		powerupDuration = 0;
 	}
 	
 	@Override
@@ -79,7 +85,7 @@ public class MSWS_Player extends GameElement
 		double spawnY = getyPos()+(getRadius()+1)*Math.sin(getBearing());
 		double vX = getxVel() + PROJECTILE_MUZZLE_VELOCITY*Math.cos(getBearing());
 		double vY = getyVel() + PROJECTILE_MUZZLE_VELOCITY*Math.sin(getBearing());
-		MSWS_Projectile proj = new MSWS_Projectile(spawnX, spawnY, getBearing(),vX,vY);
+		MSWS_Projectile proj = new MSWS_Projectile(spawnX, spawnY, getBearing(),vX,vY,getID());
 		timeSinceLastShot = 0;
 		return proj;		
 	}
@@ -103,5 +109,19 @@ public class MSWS_Player extends GameElement
 		return myID+"\t"+myName;
 	}
 	
+	public String[] displayString()
+	{
+		String[] result = new String[9];
+		result[0] = PLAYER_GAME_ELEMENT_TYPE;
+		result[1] = ""+getID();
+		result[2] = ""+getxPos();
+		result[3] = ""+getyPos();
+		result[4] = ""+getBearing();
+		result[5] = "" + ((myUserControls & THRUST_COMMAND) > 0);
+		result[6] = ""+powerupType;
+		result[7] = ""+isUsingPowerup;
+		result[8] = ""+powerupDuration;
+		return result;
+	}
 	
 }

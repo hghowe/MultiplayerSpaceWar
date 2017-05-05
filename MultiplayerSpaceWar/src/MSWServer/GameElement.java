@@ -94,4 +94,9 @@ public abstract class GameElement implements Shared.Constants
 	{
 		isDead = true;
 	}
+	/**
+	 * creates the array of Strings that will be sent to the client to describe this game element.
+	 * @return
+	 */
+	abstract public String[] displayString();
 }
