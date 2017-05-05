@@ -25,6 +25,8 @@ public class MSW_GameRunner extends JFrame implements Shared.Constants
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setVisible(true);
 		thePanel.beginGame();
+		addKeyListener(thePanel);
+		requestFocus();
 	}
 	
 
