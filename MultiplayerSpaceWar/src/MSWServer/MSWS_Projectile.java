@@ -29,7 +29,7 @@ public class MSWS_Projectile extends GameElement
 			die();
 	}
 
-	public String[] displayString()
+	public String[] description()
 	{
 		String[] result = new String[5];
 		result[0] = PROJECTILE_GAME_ELEMENT_TYPE;

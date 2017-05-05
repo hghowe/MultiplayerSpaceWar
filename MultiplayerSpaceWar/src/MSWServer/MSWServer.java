@@ -152,7 +152,7 @@ public class MSWServer extends TimerTask implements Shared.Constants
 		List<String> messageParts = new ArrayList<String>();
 		for (GameElement element: gameElements)
 		{
-			String[] elementParts = element.displayString();
+			String[] elementParts = element.description();
 			for (String s: elementParts)
 			{
 				messageParts.add(s);

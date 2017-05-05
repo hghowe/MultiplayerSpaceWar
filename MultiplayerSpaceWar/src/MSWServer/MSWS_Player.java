@@ -109,7 +109,7 @@ public class MSWS_Player extends GameElement
 		return myID+"\t"+myName;
 	}
 	
-	public String[] displayString()
+	public String[] description()
 	{
 		String[] result = new String[9];
 		result[0] = PLAYER_GAME_ELEMENT_TYPE;
