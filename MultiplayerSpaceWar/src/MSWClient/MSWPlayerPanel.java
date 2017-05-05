@@ -190,23 +190,23 @@ public class MSWPlayerPanel extends JPanel implements Shared.Constants, KeyListe
 	public void parseMessage(String message)
 	{
 		String[] parts = message.split("\t"); // split message by tabs.
-		if (parts[0].equals(messageTypes[NEW_PLAYER_MESSAGE_TYPE]))
+		if (parts[0].equals(MESSAGE_TYPE_STRINGS[NEW_PLAYER_MESSAGE_TYPE]))
 		{
 			handlePlayerAddedMessage(parts);
 		}
-		if (parts[0].equals(messageTypes[UPDATE_MESSAGE_TYPE]))
+		if (parts[0].equals(MESSAGE_TYPE_STRINGS[UPDATE_MESSAGE_TYPE]))
 		{
 			updateItemsInWorldFromMessage(parts);
 		}
-		if (parts[0].equals(messageTypes[PLAYER_LIST_MESSAGE_TYPE]))
+		if (parts[0].equals(MESSAGE_TYPE_STRINGS[PLAYER_LIST_MESSAGE_TYPE]))
 		{
 			handlePlayerListMessage(parts);
 		}
-		if (parts[0].equals(messageTypes[PLAYER_LEAVING_MESSAGE_TYPE]))
+		if (parts[0].equals(MESSAGE_TYPE_STRINGS[PLAYER_LEAVING_MESSAGE_TYPE]))
 		{
 			handlePlayerLeavingMessage(parts);
 		}
-		if (parts[0].equals(messageTypes[DISPLAY_MESSAGE_TYPE]))
+		if (parts[0].equals(MESSAGE_TYPE_STRINGS[DISPLAY_MESSAGE_TYPE]))
 		{
 			handleDisplayMessage(parts);
 		}

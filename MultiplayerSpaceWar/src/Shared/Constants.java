@@ -3,7 +3,7 @@ package Shared;
 public interface Constants
 {
 	// Broadcast constants...
-	final String[] messageTypes = {"NEW_PLAYER","UPDATE","PLAYER_LIST","PLAYER_LEAVING","USER_CONTROLS","DISPLAY"};
+	final String[] MESSAGE_TYPE_STRINGS = {"NEW_PLAYER","UPDATE","PLAYER_LIST","PLAYER_LEAVING","USER_CONTROLS","DISPLAY"};
 	final int NEW_PLAYER_MESSAGE_TYPE     = 0;
 	final int UPDATE_MESSAGE_TYPE 	  	  = 1;
 	final int PLAYER_LIST_MESSAGE_TYPE    = 2;

@@ -168,14 +168,14 @@ public class MSWServer extends TimerTask implements Shared.Constants
 	 */
 	public void broadcast(int messageType, String longParam)
 	{
-		String message = messageTypes[messageType]+"\t"+longParam;
+		String message = MESSAGE_TYPE_STRINGS[messageType]+"\t"+longParam;
 		for (Integer id: players.keySet())
 			players.get(id).sendMessage(message);
 	}
 	
 	public void broadcast(int messageType, String[] params)
 	{
-		String message = messageTypes[messageType];
+		String message = MESSAGE_TYPE_STRINGS[messageType];
 		for (String s:params)
 			message+="\t"+s;
 		
@@ -186,7 +186,7 @@ public class MSWServer extends TimerTask implements Shared.Constants
 	public void handleMessage(String message, int playerID)
 	{
 		String[] messageComponents = message.split("\t");
-		if (messageComponents[0].equals(messageTypes[USER_CONTROLS_MESSAGE_TYPE]))
+		if (messageComponents[0].equals(MESSAGE_TYPE_STRINGS[USER_CONTROLS_MESSAGE_TYPE]))
 		{
 			players.get(playerID).setControls(Integer.parseInt(messageComponents[1]));
 		}
