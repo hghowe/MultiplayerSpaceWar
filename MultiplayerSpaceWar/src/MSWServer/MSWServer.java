@@ -131,7 +131,17 @@ public class MSWServer extends TimerTask implements Shared.Constants
 	 */
 	public void prune()
 	{
-		
+		for (int i = 0; i<gameElements.size(); i++)
+		{
+			if (gameElements.get(i).isDead())
+			{
+				if (gameElements.get(i) instanceof MSWS_Projectile)
+					projectiles.remove(gameElements.get(i));
+				
+				gameElements.remove(i);
+				i--; // since the next item just slotted into position i... we don't want to skip it.
+			}
+		}
 	}
 	
 	/**
