@@ -27,7 +27,7 @@ public class MSWS_Player extends GameElement
 		setyPos(Math.random() * SCREEN_HEIGHT);
 		setBearing( Math.random() * 2 * Math.PI - Math.PI);
 		
-		
+		setRadius(7);
 		myName = name;
 		myID = id;
 		myPrintWriter = pw;
