@@ -5,17 +5,37 @@ import java.awt.Graphics;
 import java.awt.LayoutManager;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Scanner;
 
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 public class MSWPlayerPanel extends JPanel implements Shared.Constants, KeyListener
 {
-	/**
-	 * a list of the items that should be drawn, each in the form of a list of strings.
-	 */
+	private String myName;
+	private int myID;
+	private Socket mySocket;
+	private Scanner mySocketScanner;
+	private PrintWriter mySocketWriter;
+	private final String IP_ADDRESS = "10.1.27.175"; // change this as needed.
+	private final int CHANNEL = 5000;
+	private Thread readerThread;
+	
+	
+	// A list of the items that should be drawn, each in the form of a list of strings. 
 	private List<List<String>> itemsInWorld;
+	
+	// a map that connects playerIDs with their names.
+	private Map<Integer,String> playerNames;
+	
 	private boolean currentlyDrawing;
 	private boolean leftIsPressed, rightIsPressed, fireIsPressed, thrustIsPressed, powerupIsPressed;
 	
@@ -31,12 +51,39 @@ public class MSWPlayerPanel extends JPanel implements Shared.Constants, KeyListe
 		fireIsPressed    = false;
 		thrustIsPressed  = false;
 		powerupIsPressed = false;
+		playerNames = new HashMap<Integer,String>();
 	}
 
 	public void beginGame()
 	{
 		
 		
+	}
+	
+	public void setupNetworking()
+	{
+		do
+		{
+		   myName = JOptionPane.showInputDialog("Please enter your name.");
+		} while (myName.equals(""));
+		System.out.println("Awaiting connection to server.");
+		try
+		{
+			mySocket = new Socket(IP_ADDRESS, CHANNEL);
+			mySocketScanner = new Scanner(mySocket.getInputStream());
+			mySocketWriter = new PrintWriter(mySocket.getOutputStream());
+			readerThread = new Thread(new IncomingReader());
+		
+			readerThread.start();
+			mySocketWriter.println(myName);
+			mySocketWriter.flush();
+			System.out.println("Connected.");
+		}
+		catch (IOException ioExcp)
+		{
+			System.out.println("I couldn't connect.");
+			ioExcp.printStackTrace();
+		}
 	}
 	
 	public void paintComponent(Graphics g)
@@ -74,6 +121,14 @@ public class MSWPlayerPanel extends JPanel implements Shared.Constants, KeyListe
 			// ... etc.
 			//------------------------
 			// TODO: write your code here. Keep going with the other types!
+			
+			
+			//------------------------
+
+			
+			// Optionally, draw a message from the server onscreen.
+			//------------------------
+			// TODO: write your code here.
 			
 			
 			//------------------------
@@ -132,9 +187,69 @@ public class MSWPlayerPanel extends JPanel implements Shared.Constants, KeyListe
 		throw new RuntimeException("Tried to get number of elements for type that isn't one of our types: \""+type+"\"");
 	}
 	
-
+	public void parseMessage(String message)
+	{
+		String[] parts = message.split("\t"); // split message by tabs.
+		if (parts[0].equals(messageTypes[NEW_PLAYER_MESSAGE_TYPE]))
+		{
+			handlePlayerAddedMessage(parts);
+		}
+		if (parts[0].equals(messageTypes[UPDATE_MESSAGE_TYPE]))
+		{
+			updateItemsInWorldFromMessage(parts);
+		}
+		if (parts[0].equals(messageTypes[PLAYER_LIST_MESSAGE_TYPE]))
+		{
+			handlePlayerListMessage(parts);
+		}
+		if (parts[0].equals(messageTypes[PLAYER_LEAVING_MESSAGE_TYPE]))
+		{
+			handlePlayerLeavingMessage(parts);
+		}
+		if (parts[0].equals(messageTypes[DISPLAY_MESSAGE_TYPE]))
+		{
+			handleDisplayMessage(parts);
+		}
+		
+	}
+	
 	/**
-	 * turns the various leftIsPressed, rightIsPressed, etc booleans into a single int, based on the instructions in the gamebible.
+	 * the server has just sent an updated list of id's and matching names. Update our list of names.
+	 * @param message
+	 */
+	public void handlePlayerListMessage(String[] message)
+	{
+		// I've written this one for you.
+		Map<Integer,String> temp = new HashMap<Integer,String>();
+		int index = 1;
+		while (index<message.length)
+		{
+			int id = Integer.parseInt(message[index]);
+			temp.put(id, message[index+1]);
+			index += 2;
+		}
+		while (currentlyDrawing) // wait for the paint component thread to finish.
+			;
+		playerNames = temp;
+	}
+	
+	public void handlePlayerAddedMessage(String[] message)
+	{
+		// not currently implemented. You might want to send a message onscreen, "Bob has joined the game."
+	}
+	
+	public void handlePlayerLeavingMessage(String[] message)
+	{
+		// not currently implemented. You might want to send a message onscreen, "Bob has just left the game."
+	}
+	
+	public void handleDisplayMessage(String[] message)
+	{
+		// not currently implemented. You might want to display this message, which might be something like "Bob has just died and respawned."
+	}
+	
+	/**
+	 * turns the various leftIsPressed, rightIsPressed, etc booleans into a single int, based on the instructions in the game bible.
 	 * You may want to use Constants TURN_LEFT_COMMAND, TURN_RIGHT_COMMAND, etc.
 	 * @return a binary-coded int that describes the state of the keys.
 	 */
@@ -191,6 +306,31 @@ public class MSWPlayerPanel extends JPanel implements Shared.Constants, KeyListe
 	{
 		// do nothing in this method - it is for when you have pressed-and-released a key, not good for gaming.
 		// "keyTyped" is part of the KeyListener interface, so we have to have one... but it doesn't have to do anything.
+	}
+
+	// ******************************************************* IncomingReader internal class
+	public class IncomingReader implements Runnable
+	{
+		public void run()
+		{
+			try
+			{
+				// the first thing we receive from the server is an id number.
+				myID = Integer.parseInt(mySocketScanner.nextLine());
+				
+				while(true)
+				{
+					parseMessage(mySocketScanner.nextLine());
+				}
+				
+			}
+			catch (NoSuchElementException nseExcp)
+			{
+				JOptionPane.showConfirmDialog(null,"Lost connection.");
+				System.exit(1);;
+				
+			}
+		}
 	}
 	
 }
