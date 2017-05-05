@@ -16,6 +16,7 @@ public class MSWS_Player extends GameElement
 	private int myID;
 	private PrintWriter myPrintWriter;
 	private int myUserControls;
+	private double timeSinceLastShot;
 	
 	private double health;
 	
@@ -26,14 +27,15 @@ public class MSWS_Player extends GameElement
 		setxPos(Math.random() * SCREEN_WIDTH);
 		setyPos(Math.random() * SCREEN_HEIGHT);
 		setBearing( Math.random() * 2 * Math.PI - Math.PI);
-		
 		setRadius(7);
+		
 		myName = name;
 		myID = id;
 		myPrintWriter = pw;
 		
 		myUserControls = 0;
 		health = 15;
+		timeSinceLastShot = 0;
 	}
 	
 	@Override
@@ -60,6 +62,26 @@ public class MSWS_Player extends GameElement
 			}
 		}
 		super.makeMove(dT);
+	}
+	
+	/**
+	 * if there has been enough time since the last shot, creates a bullet just outside of player's radius with an appropriate velocity;
+	 * otherwise, returns null.
+	 * @param dT
+	 * @return a new projectile (or null, if not enough time has passed since last shot).
+	 */
+	public MSWS_Projectile fire(double dT)
+	{
+		timeSinceLastShot += dT;
+		if (timeSinceLastShot < PROJECTILE_TIME_BETWEEN_SHOTS)
+			return null;
+		double spawnX = getxPos()+(getRadius()+1)*Math.cos(getBearing());
+		double spawnY = getyPos()+(getRadius()+1)*Math.sin(getBearing());
+		double vX = getxVel() + PROJECTILE_MUZZLE_VELOCITY*Math.cos(getBearing());
+		double vY = getyVel() + PROJECTILE_MUZZLE_VELOCITY*Math.sin(getBearing());
+		MSWS_Projectile proj = new MSWS_Projectile(spawnX, spawnY, getBearing(),vX,vY);
+		timeSinceLastShot = 0;
+		return proj;		
 	}
 	
 	

@@ -21,6 +21,7 @@ public interface Constants
 	
 	final double PROJECTILE_MUZZLE_VELOCITY = 75.0;
 	final double PROJECTILE_LIFETIME = 1.5; // seconds
+	final double PROJECTILE_TIME_BETWEEN_SHOTS = 0.5; // seconds
 	
 	final int TURN_LEFT_COMMAND = 1;
 	final int TURN_RIGHT_COMMAND = 2;
