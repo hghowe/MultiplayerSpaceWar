@@ -10,6 +10,12 @@ public interface Constants
 	final int PLAYER_LEAVING_MESSAGE_TYPE = 3;
 	final int USER_CONTROLS_MESSAGE_TYPE  = 4;
 	final int DISPLAY_MESSAGE_TYPE        = 5;
+
+	final String PLAYER_GAME_ELEMENT_TYPE = "PLAYER";
+	final String PROJECTILE_GAME_ELEMENT_TYPE = "PROJECTILE";
+	final String POWERUP_GAME_ELEMENT_TYPE = "POWERUP";
+	final String ASTEROID_GAME_ELEMENT_TYPE = "ASTEROID";
+	final String WORMHOLE_GAME_ELEMENT_TYPE = "WORMHOLE";
 	
 	final int SCREEN_WIDTH = 800;
 	final int SCREEN_HEIGHT = 800;
