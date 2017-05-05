@@ -24,7 +24,7 @@ public class MSWServer extends TimerTask implements Shared.Constants
 	private Date lastUpdate;
 	
 	private List<GameElement> gameElements;
-	
+	private List<MSWS_Projectile> projectiles;
 	
 	
 	public MSWServer()
@@ -81,8 +81,8 @@ public class MSWServer extends TimerTask implements Shared.Constants
 		double dT = (currentTime.getTime() - lastUpdate.getTime()) / 1000.0;
 		lastUpdate = currentTime;
 		
-		plan(dt);
-		move(dt);
+		plan(dT);
+		move(dT);
 		detect();
 		prune();
 		announce();
@@ -92,17 +92,30 @@ public class MSWServer extends TimerTask implements Shared.Constants
 	/**
 	 * handle all pre-move decisions, such as spawning bullets, powerups, etc.
 	 */
-	public void plan(double dt)
+	public void plan(double dT)
 	{
-		// nothing yet... will be spawning.
-		
+		for (Integer id: players.keySet())
+		{
+			if ((players.get(id).getControls() & FIRE_COMMAND) > 0)
+			{
+				MSWS_Projectile proj = players.get(id).fire(dT);
+				if (proj == null)
+					continue;
+				projectiles.add(proj);
+				gameElements.add(proj);
+			}
+		}
+			
 	}
 	/**
 	 * change the locations of all the gameElements, as needed.
 	 */
-	public void move(double dt)
+	public void move(double dT)
 	{
-		
+		for (GameElement element: gameElements)
+		{
+			element.makeMove(dT);
+		}
 	}
 	
 	/**
