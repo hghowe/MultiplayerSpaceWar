@@ -111,16 +111,17 @@ public class MSWS_Player extends GameElement
 	
 	public String[] description()
 	{
-		String[] result = new String[9];
+		String[] result = new String[10];
 		result[0] = PLAYER_GAME_ELEMENT_TYPE;
 		result[1] = ""+getID();
 		result[2] = ""+getxPos();
 		result[3] = ""+getyPos();
 		result[4] = ""+getBearing();
 		result[5] = "" + ((myUserControls & THRUST_COMMAND) > 0);
-		result[6] = ""+powerupType;
-		result[7] = ""+isUsingPowerup;
-		result[8] = ""+powerupDuration;
+		result[6] = "" + health;
+		result[7] = ""+powerupType;
+		result[8] = ""+isUsingPowerup;
+		result[9] = ""+powerupDuration;
 		return result;
 	}
 	
