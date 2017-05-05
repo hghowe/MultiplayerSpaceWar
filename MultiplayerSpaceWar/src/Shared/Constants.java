@@ -16,9 +16,11 @@ public interface Constants
 	
 	final double ANGULAR_ACCELERATION_OF_PLAYER = Math.PI/15;
 	final double THRUST_OF_PLAYER = 10.0;
-	final double PLAYER_MAX_VELOCITY = 50;
+	final double PLAYER_MAX_VELOCITY = 50.0;
 	final double PLAYER_MAX_VELOCITY_SQUARED = 2500;
 	
+	final double PROJECTILE_MUZZLE_VELOCITY = 75.0;
+	final double PROJECTILE_LIFETIME = 1.5; // seconds
 	
 	final int TURN_LEFT_COMMAND = 1;
 	final int TURN_RIGHT_COMMAND = 2;
