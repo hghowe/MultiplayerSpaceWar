@@ -30,14 +30,16 @@ public class MSWServer extends TimerTask implements Shared.Constants
 	public MSWServer()
 	{
 		super();
-		nextAvailableID = 0;
+		nextAvailableID = 137;
 		lastUpdate = new Date();
 		Timer t = new Timer();
-		t.scheduleAtFixedRate(this, 0, 20);
 		players = new HashMap<Integer, MSWS_Player>();
+		projectiles = new ArrayList<MSWS_Projectile>();
+		gameElements = new ArrayList<GameElement>();
+		t.scheduleAtFixedRate(this, 0, 20);
+		
 		setupNetworking();
 		
-		gameElements = new ArrayList<GameElement>();
 		
 		
 		
@@ -186,6 +188,7 @@ public class MSWServer extends TimerTask implements Shared.Constants
 	public void handleMessage(String message, int playerID)
 	{
 		String[] messageComponents = message.split("\t");
+//		System.out.println("Got message:\t"+messageComponents[0]);
 		if (messageComponents[0].equals(MESSAGE_TYPE_STRINGS[USER_CONTROLS_MESSAGE_TYPE]))
 		{
 			players.get(playerID).setControls(Integer.parseInt(messageComponents[1]));
