@@ -20,7 +20,7 @@ public interface Constants
 	
 	// number of strings transmitted from server to client for each type of game element.
 	final int NUM_VALUES_IN_PLAYER_DESCRIPTION = 10;
-	final int NUM_VALUES_IN_PROJECTILE_DESCRIPTION = 4;
+	final int NUM_VALUES_IN_PROJECTILE_DESCRIPTION = 5;
 	final int NUM_VALUES_IN_POWERUP_DESCRIPTION = 3;
 	final int NUM_VALUES_IN_ASTEROID_DESCRIPTION = 4;
 	final int NUM_VALUES_IN_WORMHOLE_DESCRIPTION = 5;
@@ -30,8 +30,8 @@ public interface Constants
 	final int SCREEN_HEIGHT = 800;
 	
 	// player behavior constants.
-	final double ANGULAR_ACCELERATION_OF_PLAYER = Math.PI/15;
-	final double THRUST_OF_PLAYER = 10.0;
+	final double ANGULAR_ACCELERATION_OF_PLAYER = Math.PI/2;
+	final double THRUST_OF_PLAYER = 20.0;
 	final double PLAYER_MAX_VELOCITY = 50.0;
 	final double PLAYER_MAX_VELOCITY_SQUARED = 2500;
 	
