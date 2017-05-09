@@ -40,7 +40,7 @@ public class MSWS_Player extends GameElement
 		health = 15;
 		timeSinceLastShot = 0;
 		isUsingPowerup = false;
-		powerupType = 0;
+		powerupType = POWERUP_NONE;
 		powerupDuration = 0;
 	}
 	

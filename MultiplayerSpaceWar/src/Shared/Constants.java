@@ -62,6 +62,7 @@ public interface Constants
 	final String[] POWERUP_NAMES = {"Teleport","Shield","Multishot"};
 	final boolean[] POWERUP_IS_IMMEDIATE = {false, false, true};
 	final double[] POWERUP_START_DURATION = {-1,-1, -15};
+	final int POWERUP_NONE = -1;
 	final int POWERUP_TELEPORT = 0;
 	final int POWERUP_SHIELD = 1;
 	final int POWERUP_MULTISHOT = 2;
