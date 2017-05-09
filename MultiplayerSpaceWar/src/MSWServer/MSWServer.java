@@ -1,5 +1,6 @@
 package MSWServer;
 
+import java.awt.GridLayout;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
@@ -14,6 +15,8 @@ import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import javax.swing.JFrame;
+
 
 
 public class MSWServer extends TimerTask implements Shared.Constants
@@ -26,10 +29,15 @@ public class MSWServer extends TimerTask implements Shared.Constants
 	private List<GameElement> gameElements;
 	private List<MSWS_Projectile> projectiles;
 	
+	private JFrame statusWindow;
+	private StatusPanel statusPanel;
 	
 	public MSWServer()
 	{
 		super();
+		
+		setupStatusWindow();
+		
 		nextAvailableID = 137;
 		lastUpdate = new Date();
 		Timer t = new Timer();
@@ -44,6 +52,19 @@ public class MSWServer extends TimerTask implements Shared.Constants
 		
 		
 	}
+	
+	public void setupStatusWindow()
+	{
+		statusWindow = new JFrame("ServerStatus");
+		statusWindow.setSize (800,800);
+		statusWindow.getContentPane().setLayout(new GridLayout(1,1));
+		statusPanel = new StatusPanel();
+		statusWindow.getContentPane().add(statusPanel);
+		statusWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		statusWindow.setResizable(false);
+		statusWindow.setVisible(true);
+	}
+	
 
 	public void setupNetworking()
 	{
@@ -63,6 +84,8 @@ public class MSWServer extends TimerTask implements Shared.Constants
 				gameElements.add(nextPlayer);
 				broadcast(NEW_PLAYER_MESSAGE_TYPE,new String[]{""+nextAvailableID, cr.getName()});
 				sendPlayerList();
+				statusPanel.setInput(nextAvailableID,0);
+				statusPanel.setAngle(nextAvailableID, 0);
 				nextAvailableID++;
 			}
 		}
@@ -118,6 +141,9 @@ public class MSWServer extends TimerTask implements Shared.Constants
 		{
 			element.makeMove(dT);
 		}
+		
+		for (Integer id: players.keySet())
+			statusPanel.setAngle(id, players.get(id).getBearing());
 	}
 	
 	/**
@@ -192,6 +218,8 @@ public class MSWServer extends TimerTask implements Shared.Constants
 		if (messageComponents[0].equals(MESSAGE_TYPE_STRINGS[USER_CONTROLS_MESSAGE_TYPE]))
 		{
 			players.get(playerID).setControls(Integer.parseInt(messageComponents[1]));
+			statusPanel.setInput(playerID, Integer.parseInt(messageComponents[1]));
+			statusPanel.setAngle(playerID, players.get(playerID).getBearing());
 		}
 	}
 	
@@ -201,6 +229,8 @@ public class MSWServer extends TimerTask implements Shared.Constants
 		broadcast(PLAYER_LEAVING_MESSAGE_TYPE, new String[] {players.get(whichID).getName()});
 		gameElements.remove(players.get(whichID));
 		players.remove(whichID);
+		statusPanel.clearInput(whichID);
+		statusPanel.clearAngle(whichID);
 		this.sendPlayerList();
 	}
 	
