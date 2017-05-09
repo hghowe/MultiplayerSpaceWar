@@ -30,7 +30,7 @@ public class MSWS_Player extends GameElement
 		setxPos(Math.random() * SCREEN_WIDTH);
 		setyPos(Math.random() * SCREEN_HEIGHT);
 		setBearing( Math.random() * 2 * Math.PI - Math.PI);
-		setRadius(7);
+		setRadius(PLAYER_RADIUS);
 		
 		myName = name;
 		myID = id;
@@ -123,6 +123,21 @@ public class MSWS_Player extends GameElement
 		result[8] = ""+isUsingPowerup;
 		result[9] = ""+powerupDuration;
 		return result;
+	}
+	
+	public void getHurt(double amount)
+	{
+		health-=amount;
+	}
+	
+	public double getHealth() { return health;}
+	
+	public void reset()
+	{
+		setxPos(Math.random() * SCREEN_WIDTH);
+		setyPos(Math.random() * SCREEN_HEIGHT);
+		setBearing( Math.random() * 2 * Math.PI - Math.PI);
+		health = 15;
 	}
 	
 }
