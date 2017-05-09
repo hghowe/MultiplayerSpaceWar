@@ -139,7 +139,7 @@ public class MSWServer extends TimerTask implements Shared.Constants
 	public void detect()
 	{
 		detectProjectilePlayerCollisions();
-		
+		detectPowerupPlayerCollisions();
 	}
 	
 	/**
@@ -153,6 +153,9 @@ public class MSWServer extends TimerTask implements Shared.Constants
 			{
 				if (gameElements.get(i) instanceof MSWS_Projectile)
 					projectiles.remove(gameElements.get(i));
+				
+				if (gameElements.get(i) instanceof MSWS_Powerup)
+					powerups.remove(gameElements.get(i));
 				
 				gameElements.remove(i);
 				i--; // since the next item just slotted into position i... we don't want to skip it.
@@ -194,6 +197,25 @@ public class MSWServer extends TimerTask implements Shared.Constants
 			}
 	}
 	
+	public void detectPowerupPlayerCollisions()
+	{
+		for (Integer playerID: players.keySet())
+		{
+			MSWS_Player player = players.get(playerID);
+			for (MSWS_Powerup pUp: powerups)
+			{
+				double d_squared = Math.pow(pUp.getxPos()-player.getxPos(), 2)+Math.pow(pUp.getyPos()-player.getyPos(),2);
+				double thresholdSquared = Math.pow(pUp.getRadius()+player.getRadius(), 2);
+				if (d_squared < thresholdSquared)
+				{
+					pUp.die();
+					
+					
+				}
+			}
+		}
+		
+	}
 	
 	/**
 	 * send the message type string and the long param to all players.
