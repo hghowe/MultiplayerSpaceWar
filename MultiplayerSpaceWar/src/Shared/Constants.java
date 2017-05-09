@@ -31,14 +31,14 @@ public interface Constants
 	
 	// player behavior constants.
 	final double ANGULAR_ACCELERATION_OF_PLAYER = Math.PI/2;
-	final double THRUST_OF_PLAYER = 20.0;
-	final double PLAYER_MAX_VELOCITY = 50.0;
-	final double PLAYER_MAX_VELOCITY_SQUARED = 2500;
+	final double THRUST_OF_PLAYER = 30.0;
+	final double PLAYER_MAX_VELOCITY = 75.0;
+	final double PLAYER_MAX_VELOCITY_SQUARED = 5625;
 	
 	// projectile behavior constants
 	final double PROJECTILE_MUZZLE_VELOCITY = 75.0;
 	final double PROJECTILE_LIFETIME = 1.5; // seconds
-	final double PROJECTILE_TIME_BETWEEN_SHOTS = 0.5; // seconds
+	final double PROJECTILE_TIME_BETWEEN_SHOTS = 0.25; // seconds
 	final int    NONE_PROJECTILE_MODIFIER = 0;
 	
 	// command codes for client to server transmission of user's controls, to be combined into one number.
