@@ -138,6 +138,9 @@ public class MSWS_Player extends GameElement
 		setyPos(Math.random() * SCREEN_HEIGHT);
 		setBearing( Math.random() * 2 * Math.PI - Math.PI);
 		health = 15;
+		powerupType = POWERUP_NONE;
+		powerupDuration = 0;
+		isUsingPowerup = false;
 	}
 	
 	public void setPowerup(int type, boolean startsActive, double startingDuration)
