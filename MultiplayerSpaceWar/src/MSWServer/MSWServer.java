@@ -25,7 +25,9 @@ public class MSWServer extends TimerTask implements Shared.Constants
 	
 	private List<GameElement> gameElements;
 	private List<MSWS_Projectile> projectiles;
+	private List<MSWS_Powerup> powerups;
 	
+	double timeSinceLastPowerup = 0;
 	
 	public MSWServer()
 	{
@@ -38,6 +40,9 @@ public class MSWServer extends TimerTask implements Shared.Constants
 		setupNetworking();
 		
 		gameElements = new ArrayList<GameElement>();
+		projectiles = new ArrayList<MSWS_Projectile>();
+		powerups = new ArrayList<MSWS_Powerup>();
+		
 		
 		
 		
@@ -47,7 +52,7 @@ public class MSWServer extends TimerTask implements Shared.Constants
 	{
 		try
 		{
-			mySocket = new ServerSocket(5000);
+			mySocket = new ServerSocket(5001);
 			while (true)
 			{
 				System.out.println("Waiting for next client");
@@ -94,6 +99,8 @@ public class MSWServer extends TimerTask implements Shared.Constants
 	 */
 	public void plan(double dT)
 	{
+		timeSinceLastPowerup += dT;
+		
 		for (Integer id: players.keySet())
 		{
 			if ((players.get(id).getControls() & FIRE_COMMAND) > 0)
@@ -105,6 +112,14 @@ public class MSWServer extends TimerTask implements Shared.Constants
 				gameElements.add(proj);
 			}
 		}
+		
+		if (powerups.size() < MAX_NUM_OF_POWERUPS && POWERUP_SPAWN_CONSTANT*Math.random() < timeSinceLastPowerup)
+		{
+			MSWS_Powerup pUp = new MSWS_Powerup();
+			powerups.add(pUp);
+			gameElements.add(pUp);
+		}
+			
 			
 	}
 	/**
@@ -123,6 +138,7 @@ public class MSWServer extends TimerTask implements Shared.Constants
 	 */
 	public void detect()
 	{
+		detectProjectilePlayerCollisions();
 		
 	}
 	
@@ -160,6 +176,24 @@ public class MSWServer extends TimerTask implements Shared.Constants
 		}
 		broadcast(UPDATE_MESSAGE_TYPE, messageParts.toArray(new String[messageParts.size()]));
 	}
+	
+	public void detectProjectilePlayerCollisions()
+	{
+		for (MSWS_Projectile proj: projectiles)
+			for (Integer playerID: players.keySet())
+			{
+				MSWS_Player player = players.get(playerID);
+				double d_squared = Math.pow(proj.getxPos()-player.getxPos(), 2)+Math.pow(proj.getyPos()-player.getyPos(),2);
+				double thresholdSquared = Math.pow(proj.getRadius()+player.getRadius(), 2);
+				if (d_squared < thresholdSquared)
+				{
+					player.getHurt(PROJECTILE_PLAYER_DAMAGE);
+					proj.die();
+					break;
+				}
+			}
+	}
+	
 	
 	/**
 	 * send the message type string and the long param to all players.

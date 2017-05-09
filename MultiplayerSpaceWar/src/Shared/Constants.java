@@ -48,4 +48,18 @@ public interface Constants
 	final int FIRE_COMMAND = 8;
 	final int USE_POWERUP_COMMAND = 16;
 	
+	// dimensions of objects for collision detection
+	final int PLAYER_RADIUS = 7;
+	final int PROJECTILE_RADIUS = 2;
+	final int POWERUP_RADIUS = 10;
+	
+	// powerup specific
+	final int POWERUP_MAX_SPEED = 100;
+	final double POWERUP_SPAWN_CONSTANT = 100;
+	final int MAX_NUM_OF_POWERUPS = 3;
+	
+	// damage levels
+	final double PROJECTILE_PLAYER_DAMAGE = 1;
+	
+	
 }
