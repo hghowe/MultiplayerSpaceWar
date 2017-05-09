@@ -204,13 +204,17 @@ public class MSWServer extends TimerTask implements Shared.Constants
 			MSWS_Player player = players.get(playerID);
 			for (MSWS_Powerup pUp: powerups)
 			{
+				if (pUp.isDead()) // prevents two players from getting the same powerup.
+				{ break; }
+				
 				double d_squared = Math.pow(pUp.getxPos()-player.getxPos(), 2)+Math.pow(pUp.getyPos()-player.getyPos(),2);
 				double thresholdSquared = Math.pow(pUp.getRadius()+player.getRadius(), 2);
 				if (d_squared < thresholdSquared)
 				{
 					pUp.die();
-					
-					
+					int whichPowerup = (int)(POWERUP_NAMES.length*Math.random());
+					player.setPowerup(whichPowerup, POWERUP_IS_IMMEDIATE[whichPowerup], POWERUP_START_DURATION[whichPowerup]);
+					broadcast(DISPLAY_MESSAGE_TYPE,player.getName()+" just picked up "+POWERUP_NAMES[whichPowerup]);
 				}
 			}
 		}

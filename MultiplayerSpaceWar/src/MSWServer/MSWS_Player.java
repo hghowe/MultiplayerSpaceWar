@@ -19,7 +19,7 @@ public class MSWS_Player extends GameElement
 	private double timeSinceLastShot;
 	private boolean isUsingPowerup;
 	private int powerupType;
-	private int powerupDuration;
+	private double powerupDuration;
 	
 	private double health;
 	
@@ -140,4 +140,10 @@ public class MSWS_Player extends GameElement
 		health = 15;
 	}
 	
+	public void setPowerup(int type, boolean startsActive, double startingDuration)
+	{
+		powerupType = type;
+		isUsingPowerup = startsActive;
+		powerupDuration = startingDuration;
+	}
 }
