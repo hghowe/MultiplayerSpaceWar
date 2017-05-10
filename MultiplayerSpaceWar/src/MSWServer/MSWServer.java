@@ -105,11 +105,12 @@ public class MSWServer extends TimerTask implements Shared.Constants
 		{
 			if ((players.get(id).getControls() & FIRE_COMMAND) > 0)
 			{
-				MSWS_Projectile proj = players.get(id).fire(dT);
+				List<MSWS_Projectile> proj = players.get(id).fire(dT);
 				if (proj == null)
 					continue;
-				projectiles.add(proj);
-				gameElements.add(proj);
+				
+				projectiles.addAll(proj);
+				gameElements.addAll(proj);
 			}
 		}
 		
@@ -186,11 +187,13 @@ public class MSWServer extends TimerTask implements Shared.Constants
 			for (Integer playerID: players.keySet())
 			{
 				MSWS_Player player = players.get(playerID);
+				if (player.getPowerupType() == POWERUP_SHIELD && player.isUsingPowerup()) // immune to projectiles
+					continue;
 				double d_squared = Math.pow(proj.getxPos()-player.getxPos(), 2)+Math.pow(proj.getyPos()-player.getyPos(),2);
 				double thresholdSquared = Math.pow(proj.getRadius()+player.getRadius(), 2);
 				if (d_squared < thresholdSquared)
 				{
-					player.getHurt(PROJECTILE_PLAYER_DAMAGE);
+					player.getHurt(proj.getDamage());
 					proj.die();
 					break;
 				}

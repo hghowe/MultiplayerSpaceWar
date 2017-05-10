@@ -41,4 +41,13 @@ public class MSWS_Projectile extends GameElement
 		return result;
 	}
 	
+	public double getDamage()
+	{
+		if (modifier == DOUBLE_DAMAGE_PROJECTILE_MODIFIER)
+			return 2*PROJECTILE_PLAYER_DAMAGE;
+		return PROJECTILE_PLAYER_DAMAGE;
+	}
+	
+	public void setModifier(int mod) {modifier = mod;}
+	public int getModifier() {return modifier;}
 }

@@ -40,6 +40,7 @@ public interface Constants
 	final double PROJECTILE_LIFETIME = 1.5; // seconds
 	final double PROJECTILE_TIME_BETWEEN_SHOTS = 0.5; // seconds
 	final int    NONE_PROJECTILE_MODIFIER = 0;
+	final int 	DOUBLE_DAMAGE_PROJECTILE_MODIFIER = 1;
 	
 	// command codes for client to server transmission of user's controls, to be combined into one number.
 	final int TURN_LEFT_COMMAND = 1;
@@ -59,17 +60,23 @@ public interface Constants
 	final int MAX_NUM_OF_POWERUPS = 3;
 	
 	// powerup types
-	final String[] POWERUP_NAMES = {"????","","Teleport","Shield","Multishot"};
-	final boolean[] POWERUP_IS_IMMEDIATE = {false, false, false, false, true};
-	final double[] POWERUP_START_DURATION = {0, 0, -1,-1, -15};
+	final String[] POWERUP_NAMES = {"????","","Teleport","Shield","Multishot","Heavy Shot"};
+	final boolean[] POWERUP_IS_IMMEDIATE = {false, false, false, false, true, true};
+	final double[] POWERUP_START_DURATION = {0, 0, -1, 2.0, -15, 7};
 	final int POWERUP_UNKNOWN = 0; // player has one, but others don't know what it is... yet.
 	final int POWERUP_NONE = 1;
 	final int POWERUP_TELEPORT = 2;
 	final int POWERUP_SHIELD = 3;
 	final int POWERUP_MULTISHOT = 4;
+	final int POWERUP_HEAVY_SHOT = 5;
+	
+	// powerup features
+	final double POWERUP_MULTISHOT_SPREAD = Math.PI / 6;
+	
 	
 	// damage levels
 	final double PROJECTILE_PLAYER_DAMAGE = 1;
+	
 	
 	
 }

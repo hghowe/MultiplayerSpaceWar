@@ -8,6 +8,7 @@
 package MSWServer;
 
 import java.io.PrintWriter;
+import java.util.ArrayList;
 
 
 public class MSWS_Player extends GameElement
@@ -85,18 +86,34 @@ public class MSWS_Player extends GameElement
 	 * @param dT
 	 * @return a new projectile (or null, if not enough time has passed since last shot).
 	 */
-	public MSWS_Projectile fire(double dT)
+	public ArrayList<MSWS_Projectile> fire(double dT)
 	{
 		timeSinceLastShot += dT;
 		if (timeSinceLastShot < PROJECTILE_TIME_BETWEEN_SHOTS)
 			return null;
+		ArrayList<MSWS_Projectile> shots = new ArrayList<MSWS_Projectile>();
 		double spawnX = getxPos()+(getRadius()+1)*Math.cos(getBearing());
 		double spawnY = getyPos()+(getRadius()+1)*Math.sin(getBearing());
 		double vX = getxVel() + PROJECTILE_MUZZLE_VELOCITY*Math.cos(getBearing());
 		double vY = getyVel() + PROJECTILE_MUZZLE_VELOCITY*Math.sin(getBearing());
 		MSWS_Projectile proj = new MSWS_Projectile(spawnX, spawnY, getBearing(),vX,vY,getID());
+		shots.add(proj);
+		if (isUsingPowerup && powerupType == POWERUP_MULTISHOT)
+		{
+			vX = getxVel() + PROJECTILE_MUZZLE_VELOCITY*Math.cos(getBearing()-POWERUP_MULTISHOT_SPREAD);
+			vY = getyVel() + PROJECTILE_MUZZLE_VELOCITY*Math.sin(getBearing()-POWERUP_MULTISHOT_SPREAD);
+			proj = new MSWS_Projectile(spawnX, spawnY, getBearing(),vX,vY,getID());
+			shots.add(proj);
+			vX = getxVel() + PROJECTILE_MUZZLE_VELOCITY*Math.cos(getBearing()+POWERUP_MULTISHOT_SPREAD);
+			vY = getyVel() + PROJECTILE_MUZZLE_VELOCITY*Math.sin(getBearing()+POWERUP_MULTISHOT_SPREAD);
+			proj = new MSWS_Projectile(spawnX, spawnY, getBearing(),vX,vY,getID());
+			shots.add(proj);
+			powerupDuration ++;
+		}
+		if (isUsingPowerup && powerupType == POWERUP_HEAVY_SHOT)
+			proj.setModifier(DOUBLE_DAMAGE_PROJECTILE_MODIFIER);
 		timeSinceLastShot = 0;
-		return proj;		
+		return shots;		
 	}
 	
 	
@@ -172,4 +189,7 @@ public class MSWS_Player extends GameElement
 		isUsingPowerup = startsActive;
 		powerupDuration = startingDuration;
 	}
+	public int getPowerupType() { return powerupType;}
+	public boolean isUsingPowerup() {return isUsingPowerup;}
+
 }
