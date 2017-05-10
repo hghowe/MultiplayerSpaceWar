@@ -339,10 +339,11 @@ public class MSWServer extends TimerTask implements Shared.Constants
 	public void disconnectClient(int whichID)
 	{
 		System.out.println("Disconnecting "+whichID);
+		broadcast(PLAYER_LEAVING_MESSAGE_TYPE, new String[] {players.get(whichID).getName()});
+		
 		while(gameElementsInUse)
 			;
 		gameElementsInUse = true;
-			broadcast(PLAYER_LEAVING_MESSAGE_TYPE, new String[] {players.get(whichID).getName()});
 			gameElements.remove(players.get(whichID));
 			players.remove(whichID);
 			statusPanel.clearInput(whichID);
