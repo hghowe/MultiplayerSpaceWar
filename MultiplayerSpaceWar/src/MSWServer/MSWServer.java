@@ -30,7 +30,8 @@ public class MSWServer extends TimerTask implements Shared.Constants
 	private List<MSWS_Projectile> projectiles;
 	private List<MSWS_Powerup> powerups;
 	
-
+	private boolean gameElementsInUse;
+	
 	double timeSinceLastPowerup = 0;
 	private JFrame statusWindow;
 	private StatusPanel statusPanel;
@@ -49,7 +50,7 @@ public class MSWServer extends TimerTask implements Shared.Constants
 		powerups = new ArrayList<MSWS_Powerup>();
 		gameElements = new ArrayList<GameElement>();
 		t.scheduleAtFixedRate(this, 0, 20);
-		
+		gameElementsInUse = false;
 		setupNetworking();
 		
 		
@@ -86,7 +87,11 @@ public class MSWServer extends TimerTask implements Shared.Constants
 				ClientReader cr = new ClientReader(clientSocket, pw);
 				MSWS_Player nextPlayer = new MSWS_Player(cr.getName(),nextAvailableID, pw);
 				players.put(nextAvailableID, nextPlayer);
-				gameElements.add(nextPlayer);
+				while(gameElementsInUse)
+					;
+				gameElementsInUse = true;
+					gameElements.add(nextPlayer);
+				gameElementsInUse = false;
 				broadcast(NEW_PLAYER_MESSAGE_TYPE,new String[]{""+nextAvailableID, cr.getName()});
 				sendPlayerList();
 				statusPanel.setInput(nextAvailableID,0);
@@ -134,9 +139,12 @@ public class MSWServer extends TimerTask implements Shared.Constants
 				List<MSWS_Projectile> proj = player.fire(dT);
 				if (proj == null)
 					continue;
-				
-				projectiles.addAll(proj);
-				gameElements.addAll(proj);
+				while(gameElementsInUse)
+					;
+				gameElementsInUse = true;
+					projectiles.addAll(proj);
+					gameElements.addAll(proj);
+				gameElementsInUse = false;
 			}
 			if ((player.getControls() & USE_POWERUP_COMMAND) > 0 && player.getPowerupType() == POWERUP_TELEPORT)
 			{
@@ -149,8 +157,12 @@ public class MSWServer extends TimerTask implements Shared.Constants
 		if (powerups.size() < MAX_NUM_OF_POWERUPS && POWERUP_SPAWN_CONSTANT*Math.random() < timeSinceLastPowerup)
 		{
 			MSWS_Powerup pUp = new MSWS_Powerup();
-			powerups.add(pUp);
-			gameElements.add(pUp);
+			while(gameElementsInUse)
+				;
+			gameElementsInUse = true;
+				powerups.add(pUp);
+				gameElements.add(pUp);
+			gameElementsInUse = false;
 		}
 			
 			
@@ -160,13 +172,17 @@ public class MSWServer extends TimerTask implements Shared.Constants
 	 */
 	public void move(double dT)
 	{
-		for (GameElement element: gameElements)
-		{
-			element.makeMove(dT);
-		}
-		
-		for (Integer id: players.keySet())
-			statusPanel.setAngle(id, players.get(id).getBearing());
+		while(gameElementsInUse)
+			;
+		gameElementsInUse = true;
+			for (GameElement element: gameElements)
+			{
+				element.makeMove(dT);
+			}
+			
+			for (Integer id: players.keySet())
+				statusPanel.setAngle(id, players.get(id).getBearing());
+		gameElementsInUse = false;
 	}
 	
 	/**
@@ -183,20 +199,24 @@ public class MSWServer extends TimerTask implements Shared.Constants
 	 */
 	public void prune()
 	{
-		for (int i = 0; i<gameElements.size(); i++)
-		{
-			if (gameElements.get(i).isDead())
+		while(gameElementsInUse)
+			;
+		gameElementsInUse = true;
+			for (int i = 0; i<gameElements.size(); i++)
 			{
-				if (gameElements.get(i) instanceof MSWS_Projectile)
-					projectiles.remove(gameElements.get(i));
-				
-				if (gameElements.get(i) instanceof MSWS_Powerup)
-					powerups.remove(gameElements.get(i));
-				
-				gameElements.remove(i);
-				i--; // since the next item just slotted into position i... we don't want to skip it.
+				if (gameElements.get(i).isDead())
+				{
+					if (gameElements.get(i) instanceof MSWS_Projectile)
+						projectiles.remove(gameElements.get(i));
+					
+					if (gameElements.get(i) instanceof MSWS_Powerup)
+						powerups.remove(gameElements.get(i));
+					
+					gameElements.remove(i);
+					i--; // since the next item just slotted into position i... we don't want to skip it.
+				}
 			}
-		}
+		gameElementsInUse = false;
 	}
 	
 	/**
@@ -205,58 +225,70 @@ public class MSWServer extends TimerTask implements Shared.Constants
 	public void announce()
 	{
 		List<String> messageParts = new ArrayList<String>();
-		for (GameElement element: gameElements)
-		{
-			String[] elementParts = element.description();
-			for (String s: elementParts)
+		while(gameElementsInUse)
+			;
+		gameElementsInUse = true;
+			for (GameElement element: gameElements)
 			{
-				messageParts.add(s);
+				String[] elementParts = element.description();
+				for (String s: elementParts)
+				{
+					messageParts.add(s);
+				}
 			}
-		}
+		gameElementsInUse = false;
 		broadcast(UPDATE_MESSAGE_TYPE, messageParts.toArray(new String[messageParts.size()]));
 	}
 	
 	public void detectProjectilePlayerCollisions()
 	{
-		for (MSWS_Projectile proj: projectiles)
-			for (Integer playerID: players.keySet())
-			{
-				MSWS_Player player = players.get(playerID);
-				if (player.getPowerupType() == POWERUP_SHIELD && player.isUsingPowerup()) // immune to projectiles
-					continue;
-				double d_squared = Math.pow(proj.getxPos()-player.getxPos(), 2)+Math.pow(proj.getyPos()-player.getyPos(),2);
-				double thresholdSquared = Math.pow(proj.getRadius()+player.getRadius(), 2);
-				if (d_squared < thresholdSquared)
+		while(gameElementsInUse)
+			;
+		gameElementsInUse = true;
+			for (MSWS_Projectile proj: projectiles)
+				for (Integer playerID: players.keySet())
 				{
-					player.getHurt(proj.getDamage());
-					proj.die();
-					break;
+					MSWS_Player player = players.get(playerID);
+					if (player.getPowerupType() == POWERUP_SHIELD && player.isUsingPowerup()) // immune to projectiles
+						continue;
+					double d_squared = Math.pow(proj.getxPos()-player.getxPos(), 2)+Math.pow(proj.getyPos()-player.getyPos(),2);
+					double thresholdSquared = Math.pow(proj.getRadius()+player.getRadius(), 2);
+					if (d_squared < thresholdSquared)
+					{
+						player.getHurt(proj.getDamage());
+						proj.die();
+						break;
+					}
 				}
-			}
+		gameElementsInUse = false;
 	}
 	
 	public void detectPowerupPlayerCollisions()
 	{
-		for (Integer playerID: players.keySet())
-		{
-			MSWS_Player player = players.get(playerID);
-			for (MSWS_Powerup pUp: powerups)
+		while(gameElementsInUse)
+			;
+		gameElementsInUse = true;
+			for (Integer playerID: players.keySet())
 			{
-				if (pUp.isDead()) // prevents two players from getting the same powerup.
-				{ break; }
-				
-				double d_squared = Math.pow(pUp.getxPos()-player.getxPos(), 2)+Math.pow(pUp.getyPos()-player.getyPos(),2);
-				double thresholdSquared = Math.pow(pUp.getRadius()+player.getRadius(), 2);
-				if (d_squared < thresholdSquared)
+				MSWS_Player player = players.get(playerID);
+				for (MSWS_Powerup pUp: powerups)
 				{
-					pUp.die();
-					int whichPowerup = (int)((POWERUP_NAMES.length-2)*Math.random())+2; // the +/- 2 here is because we are skipping UNKNOWN and NONE.
-					player.setPowerup(whichPowerup, POWERUP_IS_IMMEDIATE[whichPowerup], POWERUP_START_DURATION[whichPowerup]);
-					player.sendMessage(DISPLAY_MESSAGE_TYPE+"\t"+"You just picked up "+POWERUP_NAMES[whichPowerup]);
+					if (pUp.isDead()) // prevents two players from getting the same powerup.
+					{ break; }
+					
+					double d_squared = Math.pow(pUp.getxPos()-player.getxPos(), 2)+Math.pow(pUp.getyPos()-player.getyPos(),2);
+					double thresholdSquared = Math.pow(pUp.getRadius()+player.getRadius(), 2);
+					if (d_squared < thresholdSquared)
+					{
+						pUp.die();
+						int whichPowerup = (int)((POWERUP_NAMES.length-2)*Math.random())+2; // the +/- 2 here is because we are skipping UNKNOWN and NONE.
+						System.out.println(POWERUP_NAMES[whichPowerup]);
+						player.setPowerup(whichPowerup, POWERUP_IS_IMMEDIATE[whichPowerup], POWERUP_START_DURATION[whichPowerup]);
+						player.sendMessage(DISPLAY_MESSAGE_TYPE+"\t"+"You just picked up "+POWERUP_NAMES[whichPowerup]);
+					}
 				}
 			}
-		}
-		
+		gameElementsInUse = false;
 	}
 	
 	/**
@@ -267,8 +299,12 @@ public class MSWServer extends TimerTask implements Shared.Constants
 	public void broadcast(int messageType, String longParam)
 	{
 		String message = MESSAGE_TYPE_STRINGS[messageType]+"\t"+longParam;
-		for (Integer id: players.keySet())
-			players.get(id).sendMessage(message);
+		while(gameElementsInUse)
+			;
+		gameElementsInUse = true;
+			for (Integer id: players.keySet())
+				players.get(id).sendMessage(message);
+		gameElementsInUse = false;
 	}
 	
 	public void broadcast(int messageType, String[] params)
@@ -276,31 +312,42 @@ public class MSWServer extends TimerTask implements Shared.Constants
 		String message = MESSAGE_TYPE_STRINGS[messageType];
 		for (String s:params)
 			message+="\t"+s;
-		
-		for (Integer id: players.keySet())
-			players.get(id).sendMessage(message);
+		while(gameElementsInUse)
+			;
+		gameElementsInUse = true;
+			for (Integer id: players.keySet())
+				players.get(id).sendMessage(message);
+		gameElementsInUse = false;
 	}
 	
 	public void handleMessage(String message, int playerID)
 	{
 		String[] messageComponents = message.split("\t");
 //		System.out.println("Got message:\t"+messageComponents[0]);
-		if (messageComponents[0].equals(MESSAGE_TYPE_STRINGS[USER_CONTROLS_MESSAGE_TYPE]))
-		{
-			players.get(playerID).setControls(Integer.parseInt(messageComponents[1]));
-			statusPanel.setInput(playerID, Integer.parseInt(messageComponents[1]));
-			statusPanel.setAngle(playerID, players.get(playerID).getBearing());
-		}
+		while(gameElementsInUse)
+			;
+		gameElementsInUse = true;
+			if (messageComponents[0].equals(MESSAGE_TYPE_STRINGS[USER_CONTROLS_MESSAGE_TYPE]))
+			{
+				players.get(playerID).setControls(Integer.parseInt(messageComponents[1]));
+				statusPanel.setInput(playerID, Integer.parseInt(messageComponents[1]));
+				statusPanel.setAngle(playerID, players.get(playerID).getBearing());
+			}
+		gameElementsInUse = false;
 	}
 	
 	public void disconnectClient(int whichID)
 	{
 		System.out.println("Disconnecting "+whichID);
-		broadcast(PLAYER_LEAVING_MESSAGE_TYPE, new String[] {players.get(whichID).getName()});
-		gameElements.remove(players.get(whichID));
-		players.remove(whichID);
-		statusPanel.clearInput(whichID);
-		statusPanel.clearAngle(whichID);
+		while(gameElementsInUse)
+			;
+		gameElementsInUse = true;
+			broadcast(PLAYER_LEAVING_MESSAGE_TYPE, new String[] {players.get(whichID).getName()});
+			gameElements.remove(players.get(whichID));
+			players.remove(whichID);
+			statusPanel.clearInput(whichID);
+			statusPanel.clearAngle(whichID);
+		gameElementsInUse = false;
 		this.sendPlayerList();
 	}
 	
