@@ -30,12 +30,10 @@ public class MSWServer extends TimerTask implements Shared.Constants
 	private List<MSWS_Projectile> projectiles;
 	private List<MSWS_Powerup> powerups;
 	
-<<<<<<< HEAD
+
 	double timeSinceLastPowerup = 0;
-=======
 	private JFrame statusWindow;
 	private StatusPanel statusPanel;
->>>>>>> branch 'master' of https://github.com/hghowe/MultiplayerSpaceWar.git
 	
 	public MSWServer()
 	{
@@ -48,18 +46,13 @@ public class MSWServer extends TimerTask implements Shared.Constants
 		Timer t = new Timer();
 		players = new HashMap<Integer, MSWS_Player>();
 		projectiles = new ArrayList<MSWS_Projectile>();
+		powerups = new ArrayList<MSWS_Powerup>();
 		gameElements = new ArrayList<GameElement>();
 		t.scheduleAtFixedRate(this, 0, 20);
 		
 		setupNetworking();
 		
-<<<<<<< HEAD
-		gameElements = new ArrayList<GameElement>();
-		projectiles = new ArrayList<MSWS_Projectile>();
-		powerups = new ArrayList<MSWS_Powerup>();
 		
-=======
->>>>>>> branch 'master' of https://github.com/hghowe/MultiplayerSpaceWar.git
 		
 		
 		
