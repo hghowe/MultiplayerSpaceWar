@@ -59,13 +59,14 @@ public interface Constants
 	final int MAX_NUM_OF_POWERUPS = 3;
 	
 	// powerup types
-	final String[] POWERUP_NAMES = {"Teleport","Shield","Multishot"};
-	final boolean[] POWERUP_IS_IMMEDIATE = {false, false, true};
-	final double[] POWERUP_START_DURATION = {-1,-1, -15};
-	final int POWERUP_NONE = -1;
-	final int POWERUP_TELEPORT = 0;
-	final int POWERUP_SHIELD = 1;
-	final int POWERUP_MULTISHOT = 2;
+	final String[] POWERUP_NAMES = {"????","","Teleport","Shield","Multishot"};
+	final boolean[] POWERUP_IS_IMMEDIATE = {false, false, false, false, true};
+	final double[] POWERUP_START_DURATION = {0, 0, -1,-1, -15};
+	final int POWERUP_UNKNOWN = 0; // player has one, but others don't know what it is... yet.
+	final int POWERUP_NONE = 1;
+	final int POWERUP_TELEPORT = 2;
+	final int POWERUP_SHIELD = 3;
+	final int POWERUP_MULTISHOT = 4;
 	
 	// damage levels
 	final double PROJECTILE_PLAYER_DAMAGE = 1;

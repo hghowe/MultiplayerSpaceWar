@@ -68,6 +68,15 @@ public class MSWS_Player extends GameElement
 			}
 		}
 		super.makeMove(dT);
+		// decrease time remaining if this is a timed powerup.
+		if (isUsingPowerup & powerupDuration > 0)
+		{
+			powerupDuration = Math.max(powerupDuration-dT, 0);
+		}
+		
+		// if the powerup is in use, but you have run out of shots or time, clear the powerup.
+		if (isUsingPowerup && powerupDuration == 0)
+			resetPowerup();
 	}
 	
 	/**
@@ -119,7 +128,10 @@ public class MSWS_Player extends GameElement
 		result[4] = ""+getBearing();
 		result[5] = "" + ((myUserControls & THRUST_COMMAND) > 0);
 		result[6] = "" + health;
-		result[7] = ""+powerupType;
+		if (isUsingPowerup || powerupType == POWERUP_NONE)
+			result[7] = ""+powerupType;
+		else
+			result[7] = ""+POWERUP_UNKNOWN;
 		result[8] = ""+isUsingPowerup;
 		result[9] = ""+powerupDuration;
 		return result;
@@ -132,12 +144,23 @@ public class MSWS_Player extends GameElement
 	
 	public double getHealth() { return health;}
 	
+	/**
+	 * player "died."
+	 */
 	public void reset()
 	{
 		setxPos(Math.random() * SCREEN_WIDTH);
 		setyPos(Math.random() * SCREEN_HEIGHT);
 		setBearing( Math.random() * 2 * Math.PI - Math.PI);
 		health = 15;
+		resetPowerup();
+	}
+	
+	/**
+	 *  player now has no powerup.
+	 */
+	public void resetPowerup()
+	{
 		powerupType = POWERUP_NONE;
 		powerupDuration = 0;
 		isUsingPowerup = false;

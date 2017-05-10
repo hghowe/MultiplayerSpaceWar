@@ -212,9 +212,9 @@ public class MSWServer extends TimerTask implements Shared.Constants
 				if (d_squared < thresholdSquared)
 				{
 					pUp.die();
-					int whichPowerup = (int)(POWERUP_NAMES.length*Math.random());
+					int whichPowerup = (int)((POWERUP_NAMES.length-2)*Math.random())+2; // the +/- 2 here is because we are skipping UNKNOWN and NONE.
 					player.setPowerup(whichPowerup, POWERUP_IS_IMMEDIATE[whichPowerup], POWERUP_START_DURATION[whichPowerup]);
-					broadcast(DISPLAY_MESSAGE_TYPE,player.getName()+" just picked up "+POWERUP_NAMES[whichPowerup]);
+					player.sendMessage(DISPLAY_MESSAGE_TYPE+"\t"+"You just picked up "+POWERUP_NAMES[whichPowerup]);
 				}
 			}
 		}
