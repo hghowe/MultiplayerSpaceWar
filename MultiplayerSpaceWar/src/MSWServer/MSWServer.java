@@ -75,7 +75,7 @@ public class MSWServer extends TimerTask implements Shared.Constants
 	{
 		try
 		{
-			mySocket = new ServerSocket(5001);
+			mySocket = new ServerSocket(5000);
 			while (true)
 			{
 				System.out.println("Waiting for next client");

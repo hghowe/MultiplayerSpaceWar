@@ -22,7 +22,7 @@ public class StatusPanel extends JPanel implements Shared.Constants
 	
 	public void setInput(int id, int value)
 	{
-		System.out.println("Setting input: "+id+" --> "+value);
+//		System.out.println("Setting input: "+id+" --> "+value);
 		if (inputs.containsKey(id))
 		{
 			int oldVal = inputs.get(id);
@@ -42,7 +42,7 @@ public class StatusPanel extends JPanel implements Shared.Constants
 	
 	public void setAngle(int id, double value)
 	{
-		System.out.println("Setting input: "+id+" --> "+value);
+//		System.out.println("Setting input: "+id+" --> "+value);
 		if (angles.containsKey(id))
 		{
 			int oldVal = inputs.get(id);

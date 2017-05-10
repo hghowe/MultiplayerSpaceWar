@@ -15,8 +15,10 @@ public class MSWS_Powerup extends GameElement implements Shared.Constants
 		setxPos(SCREEN_WIDTH*Math.random());
 		setyPos(SCREEN_HEIGHT*Math.random());
 		double theta = 2*Math.PI * Math.random() - Math.PI;
-		setxVel(POWERUP_MAX_SPEED*Math.cos(theta));
-		setyVel(POWERUP_MAX_SPEED*Math.sin(theta));
+		double speed = POWERUP_MAX_SPEED * Math.random();
+		setxVel(speed*Math.cos(theta));
+		setyVel(speed*Math.sin(theta));
+		setRadius(POWERUP_RADIUS);
 		
 	}
 	

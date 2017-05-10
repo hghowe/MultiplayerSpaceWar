@@ -55,8 +55,8 @@ public interface Constants
 	final int POWERUP_RADIUS = 10;
 	
 	// powerup specific
-	final int POWERUP_MAX_SPEED = 100;
-	final double POWERUP_SPAWN_CONSTANT = 100;
+	final int POWERUP_MAX_SPEED = 75;
+	final double POWERUP_SPAWN_CONSTANT = 1000;
 	final int MAX_NUM_OF_POWERUPS = 3;
 	
 	// powerup types
