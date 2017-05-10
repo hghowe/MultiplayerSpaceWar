@@ -103,14 +103,21 @@ public class MSWServer extends TimerTask implements Shared.Constants
 		
 		for (Integer id: players.keySet())
 		{
-			if ((players.get(id).getControls() & FIRE_COMMAND) > 0)
+			MSWS_Player player = players.get(id);
+			if ((player.getControls() & FIRE_COMMAND) > 0)
 			{
-				List<MSWS_Projectile> proj = players.get(id).fire(dT);
+				List<MSWS_Projectile> proj = player.fire(dT);
 				if (proj == null)
 					continue;
 				
 				projectiles.addAll(proj);
 				gameElements.addAll(proj);
+			}
+			if ((player.getControls() & USE_POWERUP_COMMAND) > 0 && player.getPowerupType() == POWERUP_TELEPORT)
+			{
+				player.setxPos(SCREEN_WIDTH*Math.random());
+				player.setyPos(SCREEN_HEIGHT*Math.random());
+				player.resetPowerup();
 			}
 		}
 		
