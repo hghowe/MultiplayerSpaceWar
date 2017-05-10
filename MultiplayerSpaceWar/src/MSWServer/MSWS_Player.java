@@ -51,12 +51,14 @@ public class MSWS_Player extends GameElement
 	 */
 	public void makeMove(double dT)
 	{
+//		System.out.println("control: "+myUserControls);
 		if ((myUserControls & TURN_LEFT_COMMAND) > 0)
-			setBearing(getBearing() + ANGULAR_ACCELERATION_OF_PLAYER * dT);
-		if ((myUserControls & TURN_RIGHT_COMMAND) >0)
 			setBearing(getBearing() - ANGULAR_ACCELERATION_OF_PLAYER * dT);
+		if ((myUserControls & TURN_RIGHT_COMMAND) >0)
+			setBearing(getBearing() + ANGULAR_ACCELERATION_OF_PLAYER * dT);
 		if ((myUserControls & THRUST_COMMAND) > 0 )
 		{
+//			System.out.println("Thrusting.");
 			setxVel(getxVel()+THRUST_OF_PLAYER*Math.cos(getBearing())*dT);
 			setyVel(getyVel()+THRUST_OF_PLAYER*Math.sin(getBearing())*dT);
 			
