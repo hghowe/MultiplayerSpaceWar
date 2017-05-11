@@ -2,23 +2,33 @@ package MSWServer;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.util.Date;
 import java.util.Map;
 import java.util.TreeMap;
 
 import javax.swing.JPanel;
 
-public class StatusPanel extends JPanel implements Shared.Constants
+public class StatusPanel extends JPanel implements Shared.Constants, KeyListener
 {
 
 	private Map<Integer, Integer> inputs;
 	private Map<Integer, Double> angles;
+	private Date lastUpdate;
+	private String state;
 	
 	public StatusPanel()
 	{
 		super();
 		inputs = new TreeMap<Integer,Integer>();
 		angles = new TreeMap<Integer,Double>();
+		lastUpdate = new Date();
+		state = "***";
+		
 	}
+	
+	public void setState(String s) {state = s;}
 	
 	public void setInput(int id, int value)
 	{
@@ -119,7 +129,36 @@ public class StatusPanel extends JPanel implements Shared.Constants
 			g.setColor(Color.red);
 			g.drawLine(locX+68, locY+8, (int)(locX+68+10*Math.cos(angles.get(id))), (int)(locY+8+10*Math.sin(angles.get(id))));
 			
+			Date now = new Date();
+			long difference = now.getTime() - lastUpdate.getTime();
+			g.setColor(Color.DARK_GRAY);
+			g.drawString(""+difference,10, 780);
+			
+			
 		}
+		
+	}
+	
+	public void resetLastUpdate()
+	{
+		lastUpdate = new Date();
+	}
+
+	@Override
+	public void keyTyped(KeyEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void keyPressed(KeyEvent e) {
+		// TODO Auto-generated method stub
+		System.out.println(state);
+	}
+
+	@Override
+	public void keyReleased(KeyEvent e) {
+		// TODO Auto-generated method stub
 		
 	}
 	

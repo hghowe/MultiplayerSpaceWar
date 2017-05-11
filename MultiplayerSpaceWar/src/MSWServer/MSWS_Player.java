@@ -130,6 +130,8 @@ public class MSWS_Player extends GameElement
 	{
 		myPrintWriter.println(message);
 		myPrintWriter.flush();
+		if (myPrintWriter.checkError())
+			System.out.println("Error sending.");
 	}
 	
 	public String toString()

@@ -36,6 +36,8 @@ public class MSWServer extends TimerTask implements Shared.Constants
 	double timeSinceLastPowerup = 0;
 	private JFrame statusWindow;
 	private StatusPanel statusPanel;
+	private int runCounter = 0;
+	private int broadcastsSent = 0;
 	
 	public MSWServer()
 	{
@@ -50,7 +52,7 @@ public class MSWServer extends TimerTask implements Shared.Constants
 		projectiles = Collections.synchronizedList(new ArrayList<MSWS_Projectile>());
 		powerups = Collections.synchronizedList(new ArrayList<MSWS_Powerup>());
 		gameElements = Collections.synchronizedList(new ArrayList<GameElement>());
-		t.scheduleAtFixedRate(this, 0, 20);
+		t.scheduleAtFixedRate(this, 0, 40);
 		setupNetworking();
 		
 		
@@ -69,6 +71,7 @@ public class MSWServer extends TimerTask implements Shared.Constants
 		statusWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		statusWindow.setResizable(false);
 		statusWindow.setVisible(true);
+		statusWindow.addKeyListener(statusPanel);
 	}
 	
 
@@ -112,12 +115,17 @@ public class MSWServer extends TimerTask implements Shared.Constants
 		double dT = (currentTime.getTime() - lastUpdate.getTime()) / 1000.0;
 		lastUpdate = currentTime;
 		
+		statusPanel.setState("plan "+runCounter);
 		plan(dT);
+		statusPanel.setState("move "+runCounter);
 		move(dT);
+		statusPanel.setState("detect "+runCounter);
 		detect();
+		statusPanel.setState("prune "+runCounter);
 		prune();
+		statusPanel.setState("announce "+runCounter+"\t broadcasts sent "+broadcastsSent);
 		announce();
-			
+		runCounter ++;	
 	}
 	
 	/**
@@ -162,19 +170,15 @@ public class MSWServer extends TimerTask implements Shared.Constants
 	{
 		synchronized(gameElements)
 		{
-		    Iterator<GameElement> iter = gameElements.iterator(); // Must be in synchronized block
-		    while (iter.hasNext())
+		    for (GameElement element: gameElements)
 		    {
-		    	GameElement element = iter.next();
 		    	element.makeMove(dT);
 			}
 		}
 		synchronized(players)
 		{
-			Iterator<Integer> iter = players.keySet().iterator();
-			while (iter.hasNext())
+			for (Integer id: players.keySet())
 			{
-				int id = iter.next();
 				MSWS_Player player = players.get(id);	
 				statusPanel.setAngle(id, player.getBearing());
 			}
@@ -291,20 +295,6 @@ public class MSWServer extends TimerTask implements Shared.Constants
 		}
 	}
 	
-	/**
-	 * send the message type string and the long param to all players.
-	 * @param messageType
-	 * @param longParam
-	 */
-	public void broadcast(int messageType, String longParam)
-	{
-		String message = MESSAGE_TYPE_STRINGS[messageType]+"\t"+longParam;
-		synchronized(players)
-		{
-			for (Integer id: players.keySet())
-				players.get(id).sendMessage(message);
-		}
-	}
 	
 	public void broadcast(int messageType, String[] params)
 	{
@@ -316,6 +306,8 @@ public class MSWServer extends TimerTask implements Shared.Constants
 			for (Integer id: players.keySet())
 				players.get(id).sendMessage(message);
 		}
+		statusPanel.resetLastUpdate();
+		broadcastsSent ++;
 	}
 	
 	public void handleMessage(String message, int playerID)
