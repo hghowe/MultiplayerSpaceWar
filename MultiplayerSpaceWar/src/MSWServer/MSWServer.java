@@ -38,6 +38,10 @@ public class MSWServer extends TimerTask implements Shared.Constants
 	private StatusPanel statusPanel;
 	private int runCounter = 0;
 	private int broadcastsSent = 0;
+	private String latestUpdateMessage;
+	private boolean updateNeedsBroadcast = false;
+	
+	private Broadcaster myBroadcaster;
 	
 	public MSWServer()
 	{
@@ -52,13 +56,11 @@ public class MSWServer extends TimerTask implements Shared.Constants
 		projectiles = Collections.synchronizedList(new ArrayList<MSWS_Projectile>());
 		powerups = Collections.synchronizedList(new ArrayList<MSWS_Powerup>());
 		gameElements = Collections.synchronizedList(new ArrayList<GameElement>());
+		myBroadcaster = new Broadcaster();
+		Thread broadcastThread = new Thread(myBroadcaster);
+		broadcastThread.start();
 		t.scheduleAtFixedRate(this, 0, 40);
 		setupNetworking();
-		
-		
-		
-		
-		
 	}
 	
 	public void setupStatusWindow()
@@ -91,7 +93,7 @@ public class MSWServer extends TimerTask implements Shared.Constants
 				MSWS_Player nextPlayer = new MSWS_Player(cr.getName(),nextAvailableID, pw);
 				players.put(nextAvailableID, nextPlayer);
 				gameElements.add(nextPlayer);
-				broadcast(NEW_PLAYER_MESSAGE_TYPE,new String[]{""+nextAvailableID, cr.getName()});
+				myBroadcaster.sendOtherMessage(NEW_PLAYER_MESSAGE_TYPE,new String[]{""+nextAvailableID, cr.getName()});
 				sendPlayerList();
 				statusPanel.setInput(nextAvailableID,0);
 				statusPanel.setAngle(nextAvailableID, 0);
@@ -235,7 +237,7 @@ public class MSWServer extends TimerTask implements Shared.Constants
 				}
 			}
 		}
-		broadcast(UPDATE_MESSAGE_TYPE, messageParts.toArray(new String[messageParts.size()]));
+		myBroadcaster.sendUpdate(messageParts.toArray(new String[messageParts.size()]));
 	}
 	
 	public void detectProjectilePlayerCollisions()
@@ -295,21 +297,6 @@ public class MSWServer extends TimerTask implements Shared.Constants
 		}
 	}
 	
-	
-	public void broadcast(int messageType, String[] params)
-	{
-		String message = MESSAGE_TYPE_STRINGS[messageType];
-		for (String s:params)
-			message+="\t"+s;
-		synchronized(players)
-		{
-			for (Integer id: players.keySet())
-				players.get(id).sendMessage(message);
-		}
-		statusPanel.resetLastUpdate();
-		broadcastsSent ++;
-	}
-	
 	public void handleMessage(String message, int playerID)
 	{
 		String[] messageComponents = message.split("\t");
@@ -329,7 +316,7 @@ public class MSWServer extends TimerTask implements Shared.Constants
 	public void disconnectClient(int whichID)
 	{
 		System.out.println("Disconnecting "+whichID);
-		broadcast(PLAYER_LEAVING_MESSAGE_TYPE, new String[] {players.get(whichID).getName()});
+		myBroadcaster.sendOtherMessage(PLAYER_LEAVING_MESSAGE_TYPE, new String[] {players.get(whichID).getName()});
 		
 		synchronized(players)
 		{
@@ -356,7 +343,78 @@ public class MSWServer extends TimerTask implements Shared.Constants
 				message[2*i+1] = players.get(id).getName();
 			}
 		}
-		broadcast(PLAYER_LIST_MESSAGE_TYPE,message);
+		myBroadcaster.sendOtherMessage(PLAYER_LIST_MESSAGE_TYPE,message);
+	}
+	
+	
+	private class Broadcaster implements Runnable
+	{
+		private boolean hasUpdate;
+		private String[] latestUpdate;
+		private List<String[]> otherMessages;
+		private List<Integer> otherMessageTypes;
+		
+		public Broadcaster()
+		{
+			otherMessages = new ArrayList<String[]>();
+			otherMessageTypes = new ArrayList<Integer>();
+			hasUpdate = false;
+			
+		}
+		
+		public void sendUpdate(String[] messageParts)
+		{
+			latestUpdate = messageParts;
+			hasUpdate = true;
+		}
+		
+		public void sendOtherMessage(int type, String[] message)
+		{
+			otherMessageTypes.add(type);
+			otherMessages.add(message);
+		}
+		
+		public void run()
+		{
+			System.out.println("Broadcaster starting.");
+			while(true)
+			{
+				if (hasUpdate)
+				{
+					String[] update = latestUpdate;
+					hasUpdate = false;
+					broadcast(UPDATE_MESSAGE_TYPE, update);
+				}
+				while (!otherMessages.isEmpty())
+				{
+					System.out.println("sending message type: "+otherMessageTypes.get(0));
+					broadcast(otherMessageTypes.remove(0), otherMessages.remove(0));
+				}
+				try {
+					Thread.sleep(BROADCAST_PERIOD);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+//			System.out.println("Broacaster stopped.");
+		}
+		
+		public void broadcast(int messageType, String[] params)
+		{
+			String message = MESSAGE_TYPE_STRINGS[messageType];
+			for (String s:params)
+				message+="\t"+s;
+			synchronized(players)
+			{
+				for (Integer id: players.keySet())
+					players.get(id).sendMessage(message);
+			}
+			statusPanel.resetLastUpdate();
+			broadcastsSent ++;
+		}
+		
+		
+		
 	}
 	
 	private class ClientReader implements Runnable

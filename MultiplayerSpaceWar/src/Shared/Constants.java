@@ -10,6 +10,8 @@ public interface Constants
 	final int PLAYER_LEAVING_MESSAGE_TYPE = 3;
 	final int USER_CONTROLS_MESSAGE_TYPE  = 4;
 	final int DISPLAY_MESSAGE_TYPE        = 5;
+	
+	final int BROADCAST_PERIOD = 30;
 
 	// strings used in communicating types of game elements from server to client
 	final String PLAYER_GAME_ELEMENT_TYPE = "PLAYER";
@@ -76,6 +78,7 @@ public interface Constants
 	
 	// damage levels
 	final double PROJECTILE_PLAYER_DAMAGE = 1;
+	
 	
 	
 	
