@@ -32,15 +32,15 @@ public interface Constants
 	final int SCREEN_HEIGHT = 800;
 	
 	// player behavior constants.
-	final double ANGULAR_ACCELERATION_OF_PLAYER = Math.PI/2;
+	final double ANGULAR_ACCELERATION_OF_PLAYER = 3*Math.PI/4;
 	final double THRUST_OF_PLAYER = 30.0;
 	final double PLAYER_MAX_VELOCITY = 75.0;
 	final double PLAYER_MAX_VELOCITY_SQUARED = 5625;
 	
 	// projectile behavior constants
-	final double PROJECTILE_MUZZLE_VELOCITY = 75.0;
+	final double PROJECTILE_MUZZLE_VELOCITY = 100.0;
 	final double PROJECTILE_LIFETIME = 1.5; // seconds
-	final double PROJECTILE_TIME_BETWEEN_SHOTS = 0.25; // seconds
+	final double PROJECTILE_TIME_BETWEEN_SHOTS = 0.125; // seconds
 	final int    NONE_PROJECTILE_MODIFIER = 0;
 	final int 	DOUBLE_DAMAGE_PROJECTILE_MODIFIER = 1;
 	
@@ -73,13 +73,13 @@ public interface Constants
 	final int POWERUP_HEAVY_SHOT = 5;
 	
 	// powerup features
-	final double POWERUP_MULTISHOT_SPREAD = Math.PI / 6;
+	final double POWERUP_MULTISHOT_SPREAD = Math.PI / 8;
 	
 	// asteroid features
 	final double MAX_ASTEROID_SPEED = 125;
 	final int[] ASTEROID_RADIUS_LEVELS = {5, 9, 15};
-	final double[] ASTEROID_STARTING_HEALTH = {1.0, 2.0, 3.0};
-	final int MIN_NUMBER_OF_ASTEROIDS = 6;
+	final double[] ASTEROID_STARTING_HEALTH = {1.0, 1.0, 2.0};
+	final int MIN_NUMBER_OF_ASTEROIDS = 4;
 	final double ASTEROID_SPAWN_CONSTANT = 5000;
 	
 	// wormhole features
