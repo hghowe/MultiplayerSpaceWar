@@ -79,12 +79,17 @@ public interface Constants
 	final double MAX_ASTEROID_SPEED = 125;
 	final int[] ASTEROID_RADIUS_LEVELS = {5, 9, 15};
 	final double[] ASTEROID_STARTING_HEALTH = {1.0, 2.0, 3.0};
-	final double[] ASTEROID_DAMAGE_TO_PLAYER = {2.0, 4.0, 6.0};
 	final int MIN_NUMBER_OF_ASTEROIDS = 6;
 	final double ASTEROID_SPAWN_CONSTANT = 5000;
 	
+	// wormhole features
+	final double MIN_WORMHOLE_SEPARATION = 100;
+	final int WORMHOLE_RADIUS = 25;
+	
+	
 	// damage levels
 	final double PROJECTILE_PLAYER_DAMAGE = 1;
+	final double[] ASTEROID_DAMAGE_TO_PLAYER = {2.0, 4.0, 6.0};
 	
 	
 	
