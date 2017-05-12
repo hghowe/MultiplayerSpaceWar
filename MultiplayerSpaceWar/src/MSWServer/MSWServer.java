@@ -238,6 +238,9 @@ public class MSWServer extends TimerTask implements Shared.Constants
 				if (gameElements.get(i) instanceof MSWS_Powerup)
 					powerups.remove(gameElements.get(i));
 				
+				if (gameElements.get(i) instanceof MSWS_Asteroid)
+					asteroids.remove(gameElements.get(i));
+				
 				gameElements.remove(i);
 				i--; // since the next item just slotted into position i... we don't want to skip it.
 			}
@@ -500,13 +503,23 @@ public class MSWServer extends TimerTask implements Shared.Constants
 		public void run()
 		{
 			System.out.println("Broadcaster starting.");
+			int numUpdates = 0;
 			while(true)
 			{
+				
 				if (hasUpdate)
 				{
 					String[] update = latestUpdate;
 					hasUpdate = false;
 					broadcast(UPDATE_MESSAGE_TYPE, update);
+					numUpdates++;
+					if (numUpdates %100 == 0)
+					{
+						String message = MESSAGE_TYPE_STRINGS[UPDATE_MESSAGE_TYPE];
+						for (String s:update)
+							message+="\t"+s;
+						System.out.println(message);
+					}
 				}
 				while (!otherMessages.isEmpty())
 				{

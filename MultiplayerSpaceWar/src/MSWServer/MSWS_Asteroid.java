@@ -75,8 +75,8 @@ public class MSWS_Asteroid extends GameElement
 	{
 		String[] result = new String[4];
 		result[0] = ASTEROID_GAME_ELEMENT_TYPE;
-		result[1] = ""+getxVel();
-		result[2] = ""+getyVel();
+		result[1] = ""+getxPos();
+		result[2] = ""+getyPos();
 		result[3] = ""+getRadius();
 		return result;
 	}
