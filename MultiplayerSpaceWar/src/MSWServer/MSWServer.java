@@ -32,7 +32,7 @@ public class MSWServer extends TimerTask implements Shared.Constants
 	private List<MSWS_Projectile> projectiles;
 	private List<MSWS_Powerup> powerups;
 	private List<MSWS_Asteroid> asteroids;
-	
+	private List<MSWS_Wormhole> wormholes;
 	
 	double timeSinceLastPowerupSpawn = 0;
 	double timeSinceLastAsteroidSpawn = 0;
@@ -58,8 +58,15 @@ public class MSWServer extends TimerTask implements Shared.Constants
 		projectiles = Collections.synchronizedList(new ArrayList<MSWS_Projectile>());
 		powerups = Collections.synchronizedList(new ArrayList<MSWS_Powerup>());
 		asteroids = Collections.synchronizedList(new ArrayList<MSWS_Asteroid>());
+		wormholes = Collections.synchronizedList(new ArrayList<MSWS_Wormhole>());
 		gameElements = Collections.synchronizedList(new ArrayList<GameElement>());
 		myBroadcaster = new Broadcaster();
+		
+		// create one wormhole.
+		MSWS_Wormhole wh = new MSWS_Wormhole();
+		wormholes.add(wh);
+		gameElements.add(wh);
+		
 		Thread broadcastThread = new Thread(myBroadcaster);
 		broadcastThread.start();
 		t.scheduleAtFixedRate(this, 0, 40);
@@ -108,9 +115,6 @@ public class MSWServer extends TimerTask implements Shared.Constants
 			ioExcp.printStackTrace();
 		}
 	}
-	
-	
-	
 	
 	
 	public void run()
@@ -215,6 +219,7 @@ public class MSWServer extends TimerTask implements Shared.Constants
 		detectPowerupPlayerCollisions();
 		detectProjectileAsteroidCollisions();
 		detectPlayerAsteroidCollisions();
+		detectPlayerWormholeCollisions();
 	}
 	
 	/**
@@ -373,6 +378,39 @@ public class MSWServer extends TimerTask implements Shared.Constants
 		{
 			gameElements.addAll(babies);
 		}
+	}
+	
+	public void detectPlayerWormholeCollisions()
+	{
+		synchronized(wormholes)
+		{
+			for (MSWS_Wormhole wh: wormholes)
+			{
+				Double[][] locs = wh.getWormHoleCoordinates();
+				synchronized(players)
+				{
+					for (Integer id: players.keySet())
+					{
+						MSWS_Player player = players.get(id);
+						for (int whichMouth = 0; whichMouth<2; whichMouth++)
+						{
+							Double[] mouthCoord = locs[whichMouth];
+							double dx = mouthCoord[0]-player.getxPos();
+							double dy = mouthCoord[1]-player.getyPos();
+							boolean headedInward = (dx*player.getxVel() + dy*player.getyVel()) >0;
+							if (headedInward && dx*dx+dy*dy < Math.pow(player.getRadius()+WORMHOLE_RADIUS, 2))
+							{
+								int otherMouth = (whichMouth + 1)%2;
+								player.setxPos(locs[otherMouth][0]+dx);
+								player.setyPos(locs[otherMouth][1]+dy);
+								break;
+							}
+						}
+					}
+				}
+			}
+		}
+		
 	}
 	
 	public boolean didCollide(GameElement element1, GameElement element2)
