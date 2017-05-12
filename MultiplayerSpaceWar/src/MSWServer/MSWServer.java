@@ -227,22 +227,41 @@ public class MSWServer extends TimerTask implements Shared.Constants
 	 */
 	public void prune()
 	{
-		
-		for (int i = 0; i<gameElements.size(); i++)
+		synchronized(gameElements)
 		{
-			if (gameElements.get(i).isDead())
+			for (int i = 0; i<gameElements.size(); i++)
 			{
-				if (gameElements.get(i) instanceof MSWS_Projectile)
-					projectiles.remove(gameElements.get(i));
-				
-				if (gameElements.get(i) instanceof MSWS_Powerup)
-					powerups.remove(gameElements.get(i));
-				
-				if (gameElements.get(i) instanceof MSWS_Asteroid)
-					asteroids.remove(gameElements.get(i));
-				
-				gameElements.remove(i);
-				i--; // since the next item just slotted into position i... we don't want to skip it.
+				if (gameElements.get(i).isDead())
+				{
+					if (gameElements.get(i) instanceof MSWS_Projectile)
+						synchronized(projectiles)
+						{	projectiles.remove(gameElements.get(i));
+						}
+					
+					if (gameElements.get(i) instanceof MSWS_Powerup)
+						synchronized(powerups)
+						{	powerups.remove(gameElements.get(i));
+						}
+					
+					if (gameElements.get(i) instanceof MSWS_Asteroid)
+						synchronized(asteroids)
+						{	asteroids.remove(gameElements.get(i));
+						}
+					
+					gameElements.remove(i);
+					i--; // since the next item just slotted into position i... we don't want to skip it.
+				}
+			}
+		}
+		synchronized(players)
+		{
+			for (Integer id: players.keySet())
+			{
+				if (players.get(id).getHealth()<0)
+				{
+					players.get(id).reset();
+					myBroadcaster.sendOtherMessage(DISPLAY_MESSAGE_TYPE, new String[] {"Player "+players.get(id).getName()+" just died."});
+				}
 			}
 		}
 	}
@@ -314,7 +333,7 @@ public class MSWServer extends TimerTask implements Shared.Constants
 							int whichPowerup = (int)((POWERUP_NAMES.length-2)*Math.random())+2; // the +/- 2 here is because we are skipping UNKNOWN and NONE.
 							System.out.println(POWERUP_NAMES[whichPowerup]);
 							player.setPowerup(whichPowerup, POWERUP_IS_IMMEDIATE[whichPowerup], POWERUP_START_DURATION[whichPowerup]);
-							player.sendMessage(DISPLAY_MESSAGE_TYPE+"\t"+"You just picked up "+POWERUP_NAMES[whichPowerup]);
+							player.sendMessage(MESSAGE_TYPE_STRINGS[DISPLAY_MESSAGE_TYPE]+"\t"+"You just picked up "+POWERUP_NAMES[whichPowerup]);
 						}
 					}
 				}
@@ -513,13 +532,13 @@ public class MSWServer extends TimerTask implements Shared.Constants
 					hasUpdate = false;
 					broadcast(UPDATE_MESSAGE_TYPE, update);
 					numUpdates++;
-					if (numUpdates %100 == 0)
-					{
-						String message = MESSAGE_TYPE_STRINGS[UPDATE_MESSAGE_TYPE];
-						for (String s:update)
-							message+="\t"+s;
-						System.out.println(message);
-					}
+//					if (numUpdates %100 == 0)
+//					{
+//						String message = MESSAGE_TYPE_STRINGS[UPDATE_MESSAGE_TYPE];
+//						for (String s:update)
+//							message+="\t"+s;
+//						System.out.println(message);
+//					}
 				}
 				while (!otherMessages.isEmpty())
 				{
