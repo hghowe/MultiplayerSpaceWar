@@ -23,6 +23,11 @@ public class MSWS_Asteroid extends GameElement
 		setxVel(speed*Math.cos(theta));
 		setyVel(speed*Math.sin(theta));
 	}
+	
+	public MSWS_Asteroid()
+	{
+		this(SCREEN_WIDTH*Math.random(),SCREEN_HEIGHT*Math.random(),2);
+	}
 
 	public void addVelocity(double deltaVX, double deltaVY)
 	{

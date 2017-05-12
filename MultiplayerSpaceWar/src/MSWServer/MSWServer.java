@@ -31,9 +31,11 @@ public class MSWServer extends TimerTask implements Shared.Constants
 	private List<GameElement> gameElements;
 	private List<MSWS_Projectile> projectiles;
 	private List<MSWS_Powerup> powerups;
+	private List<MSWS_Asteroid> asteroids;
 	
 	
-	double timeSinceLastPowerup = 0;
+	double timeSinceLastPowerupSpawn = 0;
+	double timeSinceLastAsteroidSpawn = 0;
 	private JFrame statusWindow;
 	private StatusPanel statusPanel;
 	private int runCounter = 0;
@@ -55,6 +57,7 @@ public class MSWServer extends TimerTask implements Shared.Constants
 		players = Collections.synchronizedMap(new HashMap<Integer, MSWS_Player>());
 		projectiles = Collections.synchronizedList(new ArrayList<MSWS_Projectile>());
 		powerups = Collections.synchronizedList(new ArrayList<MSWS_Powerup>());
+		asteroids = Collections.synchronizedList(new ArrayList<MSWS_Asteroid>());
 		gameElements = Collections.synchronizedList(new ArrayList<GameElement>());
 		myBroadcaster = new Broadcaster();
 		Thread broadcastThread = new Thread(myBroadcaster);
@@ -135,7 +138,8 @@ public class MSWServer extends TimerTask implements Shared.Constants
 	 */
 	public void plan(double dT)
 	{
-		timeSinceLastPowerup += dT;
+		timeSinceLastPowerupSpawn += dT;
+		timeSinceLastAsteroidSpawn += dT;
 		
 		for (Integer id: players.keySet())
 		{
@@ -156,11 +160,26 @@ public class MSWServer extends TimerTask implements Shared.Constants
 			}
 		}
 		
-		if (powerups.size() < MAX_NUM_OF_POWERUPS && POWERUP_SPAWN_CONSTANT*Math.random() < timeSinceLastPowerup)
+		if (powerups.size() < MAX_NUM_OF_POWERUPS && POWERUP_SPAWN_CONSTANT*Math.random() < timeSinceLastPowerupSpawn)
 		{
 			MSWS_Powerup pUp = new MSWS_Powerup();
-			powerups.add(pUp);
-			gameElements.add(pUp);
+			synchronized(powerups)
+			{
+				powerups.add(pUp);
+			}
+			synchronized(gameElements)
+			{
+				gameElements.add(pUp);
+			}
+			timeSinceLastPowerupSpawn = 0;
+		}
+		
+		if (asteroids.size() < MIN_NUMBER_OF_ASTEROIDS && ASTEROID_SPAWN_CONSTANT*Math.random() < timeSinceLastAsteroidSpawn)
+		{
+			MSWS_Asteroid ast = new MSWS_Asteroid();
+			asteroids.add(ast);
+			gameElements.add(ast);
+			timeSinceLastAsteroidSpawn = 0;
 		}
 			
 			
@@ -194,6 +213,7 @@ public class MSWServer extends TimerTask implements Shared.Constants
 	{
 		detectProjectilePlayerCollisions();
 		detectPowerupPlayerCollisions();
+		detectProjectileAsteroidCollisions();
 	}
 	
 	/**
@@ -253,9 +273,7 @@ public class MSWServer extends TimerTask implements Shared.Constants
 						MSWS_Player player = players.get(playerID);
 						if (player.getPowerupType() == POWERUP_SHIELD && player.isUsingPowerup()) // immune to projectiles
 							continue;
-						double d_squared = Math.pow(proj.getxPos()-player.getxPos(), 2)+Math.pow(proj.getyPos()-player.getyPos(),2);
-						double thresholdSquared = Math.pow(proj.getRadius()+player.getRadius(), 2);
-						if (d_squared < thresholdSquared)
+						if (didCollide(proj,player))
 						{
 							player.getHurt(proj.getDamage());
 							proj.die();
@@ -281,9 +299,7 @@ public class MSWServer extends TimerTask implements Shared.Constants
 						if (pUp.isDead()) // prevents two players from getting the same powerup.
 						{ break; }
 						
-						double d_squared = Math.pow(pUp.getxPos()-player.getxPos(), 2)+Math.pow(pUp.getyPos()-player.getyPos(),2);
-						double thresholdSquared = Math.pow(pUp.getRadius()+player.getRadius(), 2);
-						if (d_squared < thresholdSquared)
+						if (didCollide(pUp,player))
 						{
 							pUp.die();
 							int whichPowerup = (int)((POWERUP_NAMES.length-2)*Math.random())+2; // the +/- 2 here is because we are skipping UNKNOWN and NONE.
@@ -295,6 +311,45 @@ public class MSWServer extends TimerTask implements Shared.Constants
 				}
 			}
 		}
+	}
+
+	public void detectProjectileAsteroidCollisions()
+	{
+		List<MSWS_Asteroid> babies = new ArrayList<MSWS_Asteroid>();
+		synchronized(asteroids)
+		{
+			for (MSWS_Asteroid ast: asteroids)
+			{
+				synchronized(projectiles)
+				{
+					for (MSWS_Projectile proj: projectiles)
+					{
+						if (didCollide(ast,proj))
+						{
+							ast.takeHit(proj.getDamage());
+							if (ast.getHealth()<0)
+							{
+								babies.addAll(ast.getChildren());
+								ast.die();
+							}
+							proj.die();
+						}
+					}
+				}				
+			}
+			asteroids.addAll(babies);
+		}
+		synchronized(gameElements)
+		{
+			gameElements.addAll(babies);
+		}
+	}
+	
+	public boolean didCollide(GameElement element1, GameElement element2)
+	{
+		double d_squared = Math.pow(element1.getxPos()-element2.getxPos(), 2)+Math.pow(element1.getyPos()-element2.getyPos(),2);
+		double thresholdSquared = Math.pow(element1.getRadius()+element2.getRadius(), 2);
+		return d_squared < thresholdSquared;
 	}
 	
 	public void handleMessage(String message, int playerID)
