@@ -75,7 +75,10 @@ public interface Constants
 	// powerup features
 	final double POWERUP_MULTISHOT_SPREAD = Math.PI / 6;
 	
-	
+	// asteroid features
+	final double MAX_ASTEROID_SPEED = 125;
+	final int[] ASTEROID_RADIUS_LEVELS = {5, 9, 15};
+	final double[] ASTEROID_STARTING_HEALTH = {1.0, 2.0, 3.0};
 	// damage levels
 	final double PROJECTILE_PLAYER_DAMAGE = 1;
 	
