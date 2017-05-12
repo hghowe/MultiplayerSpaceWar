@@ -33,8 +33,13 @@ public class MSWS_Wormhole extends GameElement
 	@Override
 	public String[] description()
 	{
-		// TODO Auto-generated method stub
-		return null;
+		String[] result = new String[5];
+		result[0] = WORMHOLE_GAME_ELEMENT_TYPE;
+		result[1] = ""+getxPos();
+		result[2] = ""+getyPos();
+		result[3] = ""+xPos2;
+		result[4] = ""+yPos2;
+		return result;
 	}
 
 }
