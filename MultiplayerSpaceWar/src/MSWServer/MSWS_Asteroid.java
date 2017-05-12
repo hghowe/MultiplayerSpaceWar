@@ -42,6 +42,8 @@ public class MSWS_Asteroid extends GameElement
 	
 	public double getHealth() { return health;}
 	
+	public int getWhichSize() {return whichSize;}
+	
 	@Override
 	public int getRadius()
 	{

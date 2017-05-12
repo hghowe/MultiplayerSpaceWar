@@ -214,6 +214,7 @@ public class MSWServer extends TimerTask implements Shared.Constants
 		detectProjectilePlayerCollisions();
 		detectPowerupPlayerCollisions();
 		detectProjectileAsteroidCollisions();
+		detectPlayerAsteroidCollisions();
 	}
 	
 	/**
@@ -333,6 +334,35 @@ public class MSWServer extends TimerTask implements Shared.Constants
 								ast.die();
 							}
 							proj.die();
+						}
+					}
+				}				
+			}
+			asteroids.addAll(babies);
+		}
+		synchronized(gameElements)
+		{
+			gameElements.addAll(babies);
+		}
+	}
+	
+	public void detectPlayerAsteroidCollisions()
+	{
+		List<MSWS_Asteroid> babies = new ArrayList<MSWS_Asteroid>();
+		synchronized(asteroids)
+		{
+			for (MSWS_Asteroid ast: asteroids)
+			{
+				synchronized(players)
+				{
+					for (Integer id: players.keySet())
+					{
+						MSWS_Player player = players.get(id);
+						if (didCollide(ast,player))
+						{
+							babies.addAll(ast.getChildren());
+							ast.die();
+							player.getHurt(ASTEROID_DAMAGE_TO_PLAYER[ast.getWhichSize()]);
 						}
 					}
 				}				
